@@ -8,6 +8,7 @@ from langchain.agents.initialize import initialize_agent
 from langchain.agents.tools import Tool
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.llms.openai import OpenAI
+from langchain.llms import ChatGLM
 
 import utils
 
@@ -125,9 +126,12 @@ def cut_dialogue_history(history_memory, keep_last_n_words=500):
 
 
 class ConversationBot:
-    def __init__(self, cfg: OmegaConf):
+    def __init__(self, cfg: OmegaConf, llm="chatgpt"):
         print(f"Initializing VideoChatGPT, load_cfg={cfg}")
 
+        self.llm = llm
+        print(llm)
+        
         # instantiate model zoos
         for k, v in cfg.model_zoos.items():
             print("k:", k, "v:", v)
@@ -168,7 +172,14 @@ class ConversationBot:
             )
             place = "输入文字并回车，或者上传视频"
             label_clear = "清除"
-        self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
+        
+        if self.llm == "chatgpt":
+            self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
+        
+        elif self.llm == "chatglm":
+            endpoint_url = "http://127.0.0.1:9999/"
+            self.llm = ChatGLM(endpoint_url=endpoint_url)
+        
         self.agent = initialize_agent(
             self.tools,
             self.llm,
@@ -249,7 +260,8 @@ def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", type=str, default="./configs/backends.yaml")
     parser.add_argument("--load", type=str, default=None)
-    parser.add_argument("--port", type=int, default=7890)
+    parser.add_argument("--port", type=int, default=7893)
+    parser.add_argument("--llm", type=str, default="chatgpt")
     return parser
 
 
@@ -260,6 +272,7 @@ def main():
 
     # initialize
     cfg = OmegaConf.load(args.cfg)
+    
     if args.load is not None:
         # only load user customized model
         load_dict = {
@@ -289,7 +302,7 @@ def main():
                 for index in sorted(to_dels, reverse=True):
                     del cfg.tools[index]
 
-    bot = ConversationBot(cfg)
+    bot = ConversationBot(cfg, args.llm)
 
     # gradio frontend
     with gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}") as demo:
