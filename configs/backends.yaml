@@ -23,6 +23,8 @@ model_zoos:
     target: modules.annotator.Video2Depth
     params:
       device: cuda:1
+  ObjectTrack:
+    target: modules.OSTrack.OSTrack
   
   # Video Generation
   CannyText2Video:
@@ -119,6 +121,16 @@ tools:
       The input to this tool should be two strings, respectively representing the path of the video and the path of audio. /"
     instance: MoviepyInterface
     func: add_audio_to_video
+  - name: Track Objects in Video
+    desc: "useful when you want to track an object in a video /
+      like: Can you track the dog in the video, the original bounding box is [414,343,514,449]. /
+      The input to this tool should be a comma separated string of 5, representing the video_path, /
+      the first coordinate of the bounding box, /
+      the second coordinate of the bounding box, /
+      the third coordinate of the bounding box, /
+      the fourth coordinate of the bounding box"
+    instance: OSTrack
+    func: inference
 
   # Preprocessing
   - name: Edge Detection On Video

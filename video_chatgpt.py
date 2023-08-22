@@ -177,7 +177,7 @@ class ConversationBot:
             self.llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
         
         elif self.llm == "chatglm":
-            endpoint_url = "http://127.0.0.1:9999/"
+            endpoint_url = "http://127.0.0.1:9996/"
             self.llm = ChatGLM(endpoint_url=endpoint_url)
         
         self.agent = initialize_agent(
@@ -259,9 +259,9 @@ class ConversationBot:
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", type=str, default="./configs/backends.yaml")
-    parser.add_argument("--load", type=str, default=None)
-    parser.add_argument("--port", type=int, default=7893)
-    parser.add_argument("--llm", type=str, default="chatgpt")
+    parser.add_argument("--load", type=str, default="MoviepyInterface_cpu")
+    parser.add_argument("--port", type=int, default=7896)
+    parser.add_argument("--llm", type=str, default="chatglm")
     return parser
 
 

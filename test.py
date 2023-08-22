@@ -4,7 +4,7 @@ from langchain import PromptTemplate, LLMChain
 template = """{question}"""
 prompt = PromptTemplate(template=template, input_variables=["question"])
 
-endpoint_url = "http://127.0.0.1:7894/"
+endpoint_url = "http://0.0.0.0:9996/v1"
 
 llm = ChatGLM(
     endpoint_url=endpoint_url,
